@@ -15,6 +15,9 @@ class MovieListCell: UICollectionViewCell {
 
     override func awakeFromNib() {
         self.layer.cornerRadius = 5
+
+        movieTitleLabel.adjustsFontSizeToFitWidth = true
+        movieTitleLabel.minimumScaleFactor = 0.5
     }
 
     static var reuseIdentifier: String {

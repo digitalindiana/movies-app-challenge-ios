@@ -11,12 +11,15 @@ class MoviesListViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
 
+    let numberOfCellsPerRow: CGFloat = 2
+
     var viewModel: ModelsListViewModelProtocol? = DefaultModelsListViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         title = NSLocalizedString("Movies list", comment: "Title of Movies List Controller")
 
+        configureCollectionViewLayout()
         viewModel?.setupDataSource(for: collectionView)
     }
 
@@ -25,5 +28,17 @@ class MoviesListViewController: UIViewController {
 
         viewModel?.fetchMovies(searchedTitle: "Marvel")
     }
+
+    func configureCollectionViewLayout() {
+        if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
+            let horizontalSpacing = flowLayout.minimumInteritemSpacing
+            flowLayout.sectionInset = UIEdgeInsets(top: horizontalSpacing, left: horizontalSpacing,
+                                                   bottom: horizontalSpacing, right: horizontalSpacing)
+            let separatorsWidth = max(0, numberOfCellsPerRow - 1) * horizontalSpacing + 2 * horizontalSpacing
+            let cellWidth = (view.frame.width - separatorsWidth)/numberOfCellsPerRow
+            flowLayout.itemSize = CGSize(width: cellWidth, height: cellWidth)
+        }
+    }
+
 }
 
