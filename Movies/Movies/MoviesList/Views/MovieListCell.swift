@@ -10,6 +10,10 @@ import UIKit
 
 class MovieListCell: UICollectionViewCell {
 
+    static var reuseIdentifier: String {
+        return "MovieListCellIdentifier"
+    }
+
     @IBOutlet weak var posterImageView: UIImageView!
     @IBOutlet weak var movieTitleLabel: UILabel!
 
@@ -18,9 +22,5 @@ class MovieListCell: UICollectionViewCell {
 
         movieTitleLabel.adjustsFontSizeToFitWidth = true
         movieTitleLabel.minimumScaleFactor = 0.5
-    }
-
-    static var reuseIdentifier: String {
-        return "MovieListCellIdentifier"
     }
 }

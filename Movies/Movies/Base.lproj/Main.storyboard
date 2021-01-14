@@ -80,8 +80,8 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="u6v-L2-dzI" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="A7K-Fz-2f7"/>
+                            <constraint firstItem="u6v-L2-dzI" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Mr6-Wg-h5L"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="u6v-L2-dzI" secondAttribute="trailing" id="Qg8-fM-oC8"/>
-                            <constraint firstItem="u6v-L2-dzI" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="oWJ-ZA-LuS"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="u6v-L2-dzI" secondAttribute="bottom" id="uBw-te-11k"/>
                         </constraints>
                     </view>
@@ -98,8 +98,8 @@
         <scene sceneID="jfm-44-0BS">
             <objects>
                 <navigationController id="3zf-tg-o85" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="SNy-ik-T4G">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="SNy-ik-T4G">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>

@@ -10,7 +10,7 @@ import UIKit
 class MoviesListViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
-
+    let searchController = UISearchController(searchResultsController: nil)
     let numberOfCellsPerRow: CGFloat = 2
 
     var viewModel: ModelsListViewModelProtocol? = DefaultModelsListViewModel()
@@ -20,6 +20,8 @@ class MoviesListViewController: UIViewController {
         title = NSLocalizedString("Movies list", comment: "Title of Movies List Controller")
 
         configureCollectionViewLayout()
+        configureSearchController()
+
         viewModel?.setupDataSource(for: collectionView)
     }
 
@@ -40,5 +42,33 @@ class MoviesListViewController: UIViewController {
         }
     }
 
+    func configureSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.searchBar.placeholder = NSLocalizedString("Search for movie..", comment: "")
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController!.navigationBar.sizeToFit()
+        definesPresentationContext = true
+    }
 }
 
+extension MoviesListViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchedText = searchController.searchBar.text,
+                  searchedText.count > 2 else {
+            viewModel?.clearData()
+            return
+        }
+
+        viewModel?.fetchMovies(searchedTitle: searchedText)
+    }
+}
+
+extension MoviesListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchController.dismiss(animated: true)
+    }
+}

@@ -27,27 +27,28 @@ protocol ModelsListViewModelProtocol {
     // Setting up the data source for collection view
     func setupDataSource(for collectionView: UICollectionView)
 
+    func clearData()
     func fetchMovies(searchedTitle: String)
     func fetchMoreMovies()
 }
 
-class DefaultModelsListViewModel: ModelsListViewModelProtocol {
+class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
+
     var subscriptions: Set<AnyCancellable> = Set()
 
     func setupDataSource(for collectionView: UICollectionView) {
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView,
                                                         cellProvider: { (collectionView, indexPath, movie) -> UICollectionViewCell? in
 
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCell.reuseIdentifier,
-                                                                for: indexPath) as? MovieListCell else {
-                return UICollectionViewCell()
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCell.reuseIdentifier,
+                                                                for: indexPath) as? MovieListCell {
+                cell.movieTitleLabel.text = movie.title
+                cell.posterImageView.sd_setImage(with: URL(string: movie.poster))
+                return cell
             }
-
-            cell.movieTitleLabel.text = movie.title
-            cell.posterImageView.sd_setImage(with: URL(string: movie.poster))
-            return cell
+            return UICollectionViewCell()
         })
     }
 
@@ -65,6 +66,13 @@ class DefaultModelsListViewModel: ModelsListViewModelProtocol {
 
     func fetchMoreMovies() {
 
+    }
+
+    func clearData() {
+        var snapshot = MoviesDataSnapshot()
+        snapshot.appendSections([.movies])
+        snapshot.deleteAllItems()
+        dataSource?.apply(snapshot, animatingDifferences: true)
     }
 
     func updateListWith(_ movies: [MovieMetadata]) {
