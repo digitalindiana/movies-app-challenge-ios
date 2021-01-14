@@ -9,18 +9,21 @@ import Foundation
 
 // MARK: - MoviesListResponse
 struct MoviesListResponse: Codable {
-    let movies: [MovieMetadata]
-    let totalResults, response: String
+    let movies: [MovieMetadata]?
+    let totalResults, error: String?
+    let response: String
 
     enum CodingKeys: String, CodingKey {
         case movies = "Search"
+        case error = "Error"
         case totalResults
         case response = "Response"
     }
 }
 
 // MARK: - Movie
-struct MovieMetadata: Codable, Hashable {
+struct MovieMetadata: Codable {
+    let uuid = UUID()
     let title, year, imdbID: String
     let type: MediaType
     let poster: String
@@ -32,13 +35,15 @@ struct MovieMetadata: Codable, Hashable {
         case type = "Type"
         case poster = "Poster"
     }
+}
 
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(imdbID)
+extension MovieMetadata: Hashable {
+    static func ==(lhs: MovieMetadata, rhs: MovieMetadata) -> Bool {
+        return lhs.uuid == rhs.uuid
     }
 
-    static func == (lhs: MovieMetadata, rhs: MovieMetadata) -> Bool {
-        return lhs.imdbID == rhs.imdbID
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(uuid)
     }
 }
 

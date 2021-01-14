@@ -45,6 +45,45 @@ enum OMDBApiEndpoint: Endpoint {
     }
 }
 
+enum OMDBErrorData: ErrorData {
+    case emptyQuery
+    case noInternet
+    case error(errorDescription: String)
+
+    var imageName: String {
+        switch self {
+        case .emptyQuery:
+            return "icon_no_data"
+        case .noInternet:
+            return "icon_no_internet"
+        case .error:
+            return "icon_error"
+        }
+    }
+
+    var errorDescription: String {
+        switch self {
+        case .emptyQuery:
+            return NSLocalizedString("Type at least 3 characters to start search..", comment: "Empty data info")
+        case .noInternet:
+            return NSLocalizedString("Check Internet connection and try again", comment: "No Internet Connection")
+        case .error(errorDescription: let errorDescription):
+            return errorDescription
+        }
+    }
+
+    init(apiError: ApiError){
+        switch apiError {
+        case ApiError.noInternet:
+            self = .noInternet
+        case ApiError.generalError(error: let error):
+            self = .error(errorDescription: error.localizedDescription)
+        case ApiError.wrongUrl:
+            self = .error(errorDescription: NSLocalizedString("Wrong URL", comment: "Wrong URL"))
+        }
+    }
+}
+
 struct DefaultPagination: Pagination {
 
     var queryItem: String = ""

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E59F73625B0D50100610FDE /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E59F73525B0D50100610FDE /* ErrorView.swift */; };
+		0E59F73B25B0DC8900610FDE /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E59F73A25B0DC8900610FDE /* LoggerService.swift */; };
 		0E6F14E725AF4612004863B0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6F14E625AF4612004863B0 /* AppDelegate.swift */; };
 		0E6F14E925AF4612004863B0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6F14E825AF4612004863B0 /* SceneDelegate.swift */; };
 		0E6F14EB25AF4612004863B0 /* MoviesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6F14EA25AF4612004863B0 /* MoviesListViewController.swift */; };
@@ -42,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0E59F73525B0D50100610FDE /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		0E59F73A25B0DC8900610FDE /* LoggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerService.swift; sourceTree = "<group>"; };
 		0E6F14E325AF4612004863B0 /* Movies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E6F14E625AF4612004863B0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0E6F14E825AF4612004863B0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -159,6 +163,7 @@
 			children = (
 				0E6F152125AF4846004863B0 /* APIService.swift */,
 				0E6F154325AF8215004863B0 /* OMDBApiService.swift */,
+				0E59F73A25B0DC8900610FDE /* LoggerService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -167,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				0E6F153B25AF7598004863B0 /* MovieListCell.swift */,
+				0E59F73525B0D50100610FDE /* ErrorView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -314,8 +320,10 @@
 				0E6F14E725AF4612004863B0 /* AppDelegate.swift in Sources */,
 				0E6F152F25AF6E2D004863B0 /* MoviesListViewModel.swift in Sources */,
 				0E6F154425AF8215004863B0 /* OMDBApiService.swift in Sources */,
+				0E59F73B25B0DC8900610FDE /* LoggerService.swift in Sources */,
 				0E6F152A25AF48E8004863B0 /* MoviesListModel.swift in Sources */,
 				0E6F153C25AF7598004863B0 /* MovieListCell.swift in Sources */,
+				0E59F73625B0D50100610FDE /* ErrorView.swift in Sources */,
 				0E6F14E925AF4612004863B0 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

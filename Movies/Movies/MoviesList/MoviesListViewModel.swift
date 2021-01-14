@@ -25,9 +25,13 @@ protocol ModelsListViewModelProtocol {
     // API Service
     var apiService: APIServiceProtocol? { get }
 
+    // Handlers
+    var moviesLoaded: (([MovieMetadata]) -> ())? { get set }
+    var errorHandler: ((ErrorData) -> ())? { get set }
+
     // Setting up the data source for collection view
     func setupDataSource(for collectionView: UICollectionView)
-    func clearData()
+    func clearData(generateError: Bool)
 
     var currentMovies: [MovieMetadata] { get }
 
@@ -36,10 +40,11 @@ protocol ModelsListViewModelProtocol {
 }
 
 class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
-    var logger = Logger(label: "DefaultModelsListViewModel")
-
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
+
+    var moviesLoaded: (([MovieMetadata]) -> ())?
+    var errorHandler: ((ErrorData) -> ())?
 
     var currentMovies: [MovieMetadata] = [] {
         didSet {
@@ -74,7 +79,7 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
                lastPagination.queryItem == searchedTitle {
                 return lastPagination.nextPagination()
         } else {
-            clearData()
+            self.clearData(generateError: false)
             return DefaultPagination(queryItem: searchedTitle)
         }
     }
@@ -84,26 +89,26 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
             return
         }
 
-        logger.logLevel = .debug
         let pagination = paginationForTerm(searchedTitle)
         if !pagination.hasMoreData() {
-            logger.debug("Got all data for term: \(pagination.queryItem)")
+            LoggerService.shared.debug("Got all data for term: \(pagination.queryItem)")
             return
         }
 
-        logger.debug("Getting movies for \(searchedTitle)")
+        LoggerService.shared.debug("Getting movies for \(searchedTitle)")
 
         isLoadingData = true
 
         let endpoint = OMDBApiEndpoint.movieList(searchedTitle: searchedTitle, page: pagination.currentPage)
-        let publisher: AnyPublisher<MoviesListResponse, Error>? = apiService?.performRequest(to: endpoint)
+        let publisher: AnyPublisher<MoviesListResponse, ApiError>? = apiService?.performRequest(to: endpoint)
 
         publisher?.receive(on: DispatchQueue.main)
                   .sink(receiveCompletion: { [weak self] completion in
             guard let self = self else { return }
 
-            if case let .failure(error) = completion {
-                self.logger.error("Got error while on receving movies: \(error)")
+            if case let .failure(apiError) = completion {
+                LoggerService.shared.error("Got error while on receving movies: \(apiError)")
+                self.errorHandler?(OMDBErrorData(apiError: apiError))
             }
 
             self.isLoadingData = false
@@ -111,10 +116,19 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
         }, receiveValue: { [weak self] moviesListResponse in
             guard let self = self else { return }
 
-            self.logger.debug("Got response with \(moviesListResponse.movies.count) movies, total: \(moviesListResponse.totalResults)")
-            self.currentMovies.append(contentsOf: moviesListResponse.movies)
-            self.apiService?.pagination = pagination.update(savedItems: self.currentMovies.count,
-                                                            totalItems: Int(moviesListResponse.totalResults) ?? 0)
+            if let movies = moviesListResponse.movies,
+               let totalResultsString = moviesListResponse.totalResults,
+               let totalResults = Int(totalResultsString) {
+
+                LoggerService.shared.debug("Got response with \(movies.count) movies, total:\(totalResults)")
+                self.currentMovies.append(contentsOf: movies)
+                self.apiService?.pagination = pagination.update(savedItems: self.currentMovies.count,
+                                                                totalItems: totalResults)
+                self.moviesLoaded?(self.currentMovies)
+
+            } else if let error = moviesListResponse.error {
+                self.errorHandler?(OMDBErrorData.error(errorDescription: error))
+            }
 
         }).store(in: &subscriptions)
     }
@@ -125,9 +139,13 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
         }
     }
 
-    func clearData() {
+    func clearData(generateError: Bool) {
         self.currentMovies.removeAll()
         apiService?.pagination = nil
+
+        if generateError {
+            errorHandler?(OMDBErrorData.emptyQuery)
+        }
     }
 
     func updateListWith(_ movies: [MovieMetadata]) {

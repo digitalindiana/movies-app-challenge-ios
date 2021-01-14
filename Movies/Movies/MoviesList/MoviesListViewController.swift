@@ -10,6 +10,8 @@ import UIKit
 class MoviesListViewController: UIViewController {
 
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var errorView: ErrorView!
+
     let searchController = UISearchController(searchResultsController: nil)
     let numberOfCellsPerRow: CGFloat = 2
 
@@ -21,18 +23,14 @@ class MoviesListViewController: UIViewController {
 
         configureCollectionView()
         configureSearchController()
+        configureHandlers()
 
         viewModel?.setupDataSource(for: collectionView)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        viewModel?.fetchMovies(searchedTitle: "Marvel")
+        viewModel?.clearData(generateError: true)
     }
 
     func configureCollectionView() {
-        (collectionView as UIScrollView).delegate = self
+        collectionView.delegate = self
         if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             let horizontalSpacing = flowLayout.minimumInteritemSpacing
             flowLayout.sectionInset = UIEdgeInsets(top: horizontalSpacing, left: horizontalSpacing,
@@ -54,13 +52,31 @@ class MoviesListViewController: UIViewController {
         navigationController!.navigationBar.sizeToFit()
         definesPresentationContext = true
     }
+
+    func configureHandlers() {
+        errorView.isHidden = true
+        viewModel?.errorHandler = { errorData in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.errorView.isHidden = false
+                self.errorView.show(errorData)
+            }
+        }
+
+        viewModel?.moviesLoaded = { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.errorView.isHidden = true
+            }
+        }
+    }
 }
 
 extension MoviesListViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchedText = searchController.searchBar.text,
                   searchedText.count > 2 else {
-            viewModel?.clearData()
+            viewModel?.clearData(generateError: true)
             return
         }
 
@@ -74,12 +90,12 @@ extension MoviesListViewController: UISearchBarDelegate {
     }
 }
 
-extension MoviesListViewController: UIScrollViewDelegate {
+extension MoviesListViewController: UICollectionViewDelegate {
 
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-       let contentOffsetY = scrollView.contentOffset.y
-       if contentOffsetY >= (scrollView.contentSize.height - scrollView.bounds.height) - 20 {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.row == collectionView.numberOfItems(inSection: indexPath.section) - 1 {
             viewModel?.fetchMoreMovies()
-       }
-   }
+        }
+    }
+
 }

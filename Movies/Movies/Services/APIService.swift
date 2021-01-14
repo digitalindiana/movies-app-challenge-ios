@@ -10,6 +10,10 @@ import Combine
 
 enum ApiError: Error {
     case wrongUrl
+    case noInternet
+    case generalError(error: Error)
+
+    static let noInternetErrorCode = -1009
 }
 
 protocol Endpoint {
@@ -42,7 +46,7 @@ protocol APIServiceProtocol {
     var baseUrl: String { get }
     var pagination: Pagination? { get set }
     func fullUrl(for endpoint: Endpoint) -> URL?
-    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, Error>?
+    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, ApiError>?
 }
 
 extension APIServiceProtocol {
@@ -54,7 +58,7 @@ extension APIServiceProtocol {
         return urlComponents?.url
     }
 
-    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, Error>? {
+    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, ApiError>? {
         guard let url = fullUrl(for: endpoint) else {
             return Fail(error: ApiError.wrongUrl).eraseToAnyPublisher()
         }
@@ -62,6 +66,15 @@ extension APIServiceProtocol {
         return URLSession.shared.dataTaskPublisher(for: url)
                 .map { $0.data }
                 .decode(type: T.self, decoder: JSONDecoder())
+                .mapError({ (error) -> ApiError in
+                    let nsError = error as NSError
+
+                    if nsError.code == ApiError.noInternetErrorCode {
+                        return ApiError.noInternet
+                    }
+
+                    return ApiError.generalError(error: error)
+                })
                 .eraseToAnyPublisher()
     }
     
