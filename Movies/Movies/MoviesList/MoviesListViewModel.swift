@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import Combine
+import Logging
 import SDWebImage
 
 enum MoviesListSection {
@@ -33,6 +34,8 @@ protocol ModelsListViewModelProtocol {
 }
 
 class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
+    var logger = Logger(label: "DefaultModelsListViewModel")
+
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
 
@@ -53,13 +56,20 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
     }
 
     func fetchMovies(searchedTitle: String) {
+        logger.logLevel = .debug
+        logger.debug("Getting movies for \(searchedTitle)")
+
         let endpoint = OMDBApiEndpoint.movieList(searchedTitle: searchedTitle, page: 0)
         let publisher: AnyPublisher<MoviesListResponse, Error>? = apiService?.performRequest(to: endpoint)
 
-        publisher?.sink(receiveCompletion: { (error) in
-            print(error)
+        publisher?.receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.logger.error("Got error while on receving movies: \(error)")
+                }
+
         }, receiveValue: { [weak self] moviesListResponse in
-            print(moviesListResponse)
+            self?.logger.debug("Got response with \(moviesListResponse.movies.count) movies, total: \(moviesListResponse.totalResults)")
             self?.updateListWith(moviesListResponse.movies)
         }).store(in: &subscriptions)
     }
