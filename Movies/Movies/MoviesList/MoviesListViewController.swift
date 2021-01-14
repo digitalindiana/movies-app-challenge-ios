@@ -19,7 +19,7 @@ class MoviesListViewController: UIViewController {
         super.viewDidLoad()
         title = NSLocalizedString("Movies list", comment: "Title of Movies List Controller")
 
-        configureCollectionViewLayout()
+        configureCollectionView()
         configureSearchController()
 
         viewModel?.setupDataSource(for: collectionView)
@@ -31,7 +31,8 @@ class MoviesListViewController: UIViewController {
         viewModel?.fetchMovies(searchedTitle: "Marvel")
     }
 
-    func configureCollectionViewLayout() {
+    func configureCollectionView() {
+        (collectionView as UIScrollView).delegate = self
         if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             let horizontalSpacing = flowLayout.minimumInteritemSpacing
             flowLayout.sectionInset = UIEdgeInsets(top: horizontalSpacing, left: horizontalSpacing,
@@ -71,4 +72,14 @@ extension MoviesListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchController.dismiss(animated: true)
     }
+}
+
+extension MoviesListViewController: UIScrollViewDelegate {
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+       let contentOffsetY = scrollView.contentOffset.y
+       if contentOffsetY >= (scrollView.contentSize.height - scrollView.bounds.height) - 20 {
+            viewModel?.fetchMoreMovies()
+       }
+   }
 }

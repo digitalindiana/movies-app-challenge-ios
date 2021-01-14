@@ -18,8 +18,29 @@ protocol Endpoint {
     var queryItems: [URLQueryItem] { get }
 }
 
+protocol Pagination {
+    var queryItem: String { get }
+    var currentPage: Int { get }
+    var savedItems: Int { get }
+    var totalItems: Int { get }
+    var dataUpdated: Bool { get }
+
+    func update(savedItems: Int, totalItems: Int) -> Pagination
+    func hasMoreData() -> Bool
+    func nextPagination() -> Pagination
+}
+
+extension Pagination {
+    func hasMoreData() -> Bool {
+        let firstRun = (!dataUpdated && savedItems == 0)
+        let gotAllElements = savedItems < totalItems
+        return firstRun || gotAllElements
+    }
+}
+
 protocol APIServiceProtocol {
     var baseUrl: String { get }
+    var pagination: Pagination? { get set }
     func fullUrl(for endpoint: Endpoint) -> URL?
     func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, Error>?
 }

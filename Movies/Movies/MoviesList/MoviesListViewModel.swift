@@ -27,8 +27,10 @@ protocol ModelsListViewModelProtocol {
 
     // Setting up the data source for collection view
     func setupDataSource(for collectionView: UICollectionView)
-
     func clearData()
+
+    var currentMovies: [MovieMetadata] { get }
+
     func fetchMovies(searchedTitle: String)
     func fetchMoreMovies()
 }
@@ -38,6 +40,17 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
 
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
+
+    var currentMovies: [MovieMetadata] = [] {
+        didSet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.updateListWith(self.currentMovies)
+            }
+        }
+    }
+
+    var isLoadingData = false
 
     var subscriptions: Set<AnyCancellable> = Set()
 
@@ -55,40 +68,76 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
         })
     }
 
+    func paginationForTerm(_ searchedTitle: String) -> Pagination {
+        // If we are searching the same item -> increment page
+        if let lastPagination = apiService?.pagination,
+               lastPagination.queryItem == searchedTitle {
+                return lastPagination.nextPagination()
+        } else {
+            clearData()
+            return DefaultPagination(queryItem: searchedTitle)
+        }
+    }
+
     func fetchMovies(searchedTitle: String) {
+        if isLoadingData {
+            return
+        }
+
         logger.logLevel = .debug
+        let pagination = paginationForTerm(searchedTitle)
+        if !pagination.hasMoreData() {
+            logger.debug("Got all data for term: \(pagination.queryItem)")
+            return
+        }
+
         logger.debug("Getting movies for \(searchedTitle)")
 
-        let endpoint = OMDBApiEndpoint.movieList(searchedTitle: searchedTitle, page: 0)
+        isLoadingData = true
+
+        let endpoint = OMDBApiEndpoint.movieList(searchedTitle: searchedTitle, page: pagination.currentPage)
         let publisher: AnyPublisher<MoviesListResponse, Error>? = apiService?.performRequest(to: endpoint)
 
         publisher?.receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.logger.error("Got error while on receving movies: \(error)")
-                }
+                  .sink(receiveCompletion: { [weak self] completion in
+            guard let self = self else { return }
+
+            if case let .failure(error) = completion {
+                self.logger.error("Got error while on receving movies: \(error)")
+            }
+
+            self.isLoadingData = false
 
         }, receiveValue: { [weak self] moviesListResponse in
-            self?.logger.debug("Got response with \(moviesListResponse.movies.count) movies, total: \(moviesListResponse.totalResults)")
-            self?.updateListWith(moviesListResponse.movies)
+            guard let self = self else { return }
+
+            self.logger.debug("Got response with \(moviesListResponse.movies.count) movies, total: \(moviesListResponse.totalResults)")
+            self.currentMovies.append(contentsOf: moviesListResponse.movies)
+            self.apiService?.pagination = pagination.update(savedItems: self.currentMovies.count,
+                                                            totalItems: Int(moviesListResponse.totalResults) ?? 0)
+
         }).store(in: &subscriptions)
     }
 
     func fetchMoreMovies() {
-
+        if let lastPagination = apiService?.pagination {
+            fetchMovies(searchedTitle: lastPagination.queryItem)
+        }
     }
 
     func clearData() {
-        var snapshot = MoviesDataSnapshot()
-        snapshot.appendSections([.movies])
-        snapshot.deleteAllItems()
-        dataSource?.apply(snapshot, animatingDifferences: true)
+        self.currentMovies.removeAll()
+        apiService?.pagination = nil
     }
 
     func updateListWith(_ movies: [MovieMetadata]) {
         var snapshot = MoviesDataSnapshot()
         snapshot.appendSections([.movies])
-        snapshot.appendItems(movies)
+        if movies.count == 0 {
+            snapshot.deleteAllItems()
+        } else {
+            snapshot.appendItems(movies)
+        }
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
 }

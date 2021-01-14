@@ -32,6 +32,14 @@ struct MovieMetadata: Codable, Hashable {
         case type = "Type"
         case poster = "Poster"
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(imdbID)
+    }
+
+    static func == (lhs: MovieMetadata, rhs: MovieMetadata) -> Bool {
+        return lhs.imdbID == rhs.imdbID
+    }
 }
 
 enum MediaType: String, Codable {
