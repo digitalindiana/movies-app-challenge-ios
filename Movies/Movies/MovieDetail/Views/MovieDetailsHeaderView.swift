@@ -9,10 +9,9 @@ import Foundation
 import UIKit
 
 struct MovieDetailsHeaderModel {
-    var posterImageUrl: String?
+    var posterImageUrl: URL?
     let title: String
     let year: String
-    let playButtonAction: (() -> Void)?
 }
 
 class MovieDetailsHeaderView: UIView {
@@ -21,7 +20,9 @@ class MovieDetailsHeaderView: UIView {
     @IBOutlet weak var movieYearLabel: UILabel!
     @IBOutlet weak var playButton: UIButton!
 
-    func fill(with: MovieDetailsHeaderModel) {
-        
+    func fill(with model: MovieDetailsHeaderModel) {
+        posterImageView.sd_setImage(with: model.posterImageUrl)
+        movieTitleLabel.text = model.title
+        movieYearLabel.text = model.year
     }
 }

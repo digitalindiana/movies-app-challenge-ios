@@ -70,6 +70,15 @@ class MoviesListViewController: UIViewController {
             }
         }
     }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let movie = sender as? MovieMetadata,
+           let movieDetailsVC = segue.destination as? MovieDetailsViewController,
+           segue is MovieDetailsSegue {
+
+            movieDetailsVC.imdbId = movie.imdbID
+        }
+    }
 }
 
 extension MoviesListViewController: UISearchResultsUpdating {
@@ -91,11 +100,14 @@ extension MoviesListViewController: UISearchBarDelegate {
 }
 
 extension MoviesListViewController: UICollectionViewDelegate {
-
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if indexPath.row == collectionView.numberOfItems(inSection: indexPath.section) - 1 {
             viewModel?.fetchMoreMovies()
         }
     }
 
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let selectedMovie = viewModel?.dataSource?.itemIdentifier(for: indexPath) else { return }
+        performSegue(withIdentifier: MovieDetailsSegue.identifier, sender: selectedMovie)
+    }
 }

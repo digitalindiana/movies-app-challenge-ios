@@ -11,12 +11,16 @@ import Combine
 import Logging
 import SDWebImage
 
+typealias MovieDetailsViewModelDataTuple = (header: MovieDetailsHeaderModel,
+                                            general: MovieDetailsGeneralInfoModel,
+                                            cast: MovieDetailsCastInfoModel)
+
 protocol MovieDetailViewModelProtocol {
     // API Service
     var apiService: APIServiceProtocol? { get }
 
     // Handlers
-    var movieLoaded: ((Movie) -> ())? { get set }
+    var movieLoaded: ((MovieDetailsViewModelDataTuple) -> ())? { get set }
     var errorHandler: ((ErrorData) -> ())? { get set }
 
     var currentMovie: Movie? { get set }
@@ -26,7 +30,7 @@ protocol MovieDetailViewModelProtocol {
 class DefaultMovieDetailViewModel: NSObject, MovieDetailViewModelProtocol {
     var apiService: APIServiceProtocol? = OMDBApiService()
 
-    var movieLoaded: ((Movie) -> ())?
+    var movieLoaded: ((MovieDetailsViewModelDataTuple) -> ())?
     var errorHandler: ((ErrorData) -> ())?
 
     var currentMovie: Movie?
@@ -39,28 +43,40 @@ class DefaultMovieDetailViewModel: NSObject, MovieDetailViewModelProtocol {
         let endpoint = OMDBApiEndpoint.movieDetail(imdbID: imdbID)
         let publisher: AnyPublisher<Movie, ApiError>? = apiService?.performRequest(to: endpoint,
                                                                                    responseErrorType: OMDBApiResponseError.self)
+        publisher?.receive(on: DispatchQueue.main)
+                  .sink(receiveCompletion: { [weak self] completion in
+            guard let self = self else { return }
 
-//        publisher?.receive(on: DispatchQueue.main)
-//                  .sink(receiveCompletion: { [weak self] completion in
-//            guard let self = self else { return }
-//
-//            if case let .failure(apiError) = completion {
-//                LoggerService.shared.error("Got error while on receving movies: \(apiError)")
-//                self.errorHandler?(OMDBErrorData(apiError: apiError))
-//            }
-//
-//        }, receiveValue: { [weak self] movie in
-//            guard let self = self else { return }
-//
-//                LoggerService.shared.debug("Got response with \(movies) movie")
-//                self.currentMovie = movie
-//                self.movieLoaded?(movie)
-//
-//            } else if let error = moviesListResponse.error {
-//                self.errorHandler?(OMDBErrorData.error(errorDescription: error))
-//            }
-//
-//        }).store(in: &subscriptions)
+            if case let .failure(apiError) = completion {
+                LoggerService.shared.error("Got error while on receving movie: \(apiError)")
+                self.errorHandler?(OMDBErrorData(apiError: apiError))
+            }
+
+        }, receiveValue: { [weak self] movie in
+            guard let self = self else { return }
+                LoggerService.shared.debug("Got response with \(movie) movie")
+                self.currentMovie = movie
+                self.movieLoaded?(self.viewData(for: movie))
+            
+        }).store(in: &subscriptions)
     }
 
+    func viewData(for movie: Movie) -> MovieDetailsViewModelDataTuple {
+        let header = MovieDetailsHeaderModel(posterImageUrl: URL(string: movie.poster),
+                                             title: movie.title,
+                                             year: movie.year)
+
+        let generalInfo = MovieDetailsGeneralInfoModel(categories: movie.genre,
+                                                       duration: movie.runtime,
+                                                       rating: "⭐ \(movie.imdbRating)",
+                                                       synopsis: movie.plot,
+                                                       score: movie.imdbRating,
+                                                       reviews: movie.imdbVotes,
+                                                       popularity: movie.metascore)
+
+        let castInfo = MovieDetailsCastInfoModel(director: movie.director,
+                                                 writer: movie.writer,
+                                                 actors: movie.actors)
+        return (header, generalInfo, castInfo)
+    }
 }

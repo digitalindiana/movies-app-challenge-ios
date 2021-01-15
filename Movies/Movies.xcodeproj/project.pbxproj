@@ -28,6 +28,8 @@
 		0E6F153C25AF7598004863B0 /* MovieListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6F153B25AF7598004863B0 /* MovieListCell.swift */; };
 		0E6F154425AF8215004863B0 /* OMDBApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6F154325AF8215004863B0 /* OMDBApiService.swift */; };
 		0E6F155A25B05F8B004863B0 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 0E6F155925B05F8B004863B0 /* Logging */; };
+		0EE2302E25B1FC7C004F0D27 /* MovieDetailsCastInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE2302C25B1FC7C004F0D27 /* MovieDetailsCastInfoView.swift */; };
+		0EE2302F25B1FC7C004F0D27 /* MovieDetailsGeneralInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EE2302D25B1FC7C004F0D27 /* MovieDetailsGeneralInfoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +75,8 @@
 		0E6F152E25AF6E2D004863B0 /* MoviesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviesListViewModel.swift; sourceTree = "<group>"; };
 		0E6F153B25AF7598004863B0 /* MovieListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListCell.swift; sourceTree = "<group>"; };
 		0E6F154325AF8215004863B0 /* OMDBApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OMDBApiService.swift; sourceTree = "<group>"; };
+		0EE2302C25B1FC7C004F0D27 /* MovieDetailsCastInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDetailsCastInfoView.swift; sourceTree = "<group>"; };
+		0EE2302D25B1FC7C004F0D27 /* MovieDetailsGeneralInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieDetailsGeneralInfoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +121,8 @@
 			isa = PBXGroup;
 			children = (
 				0E59F7F325B1BF1D00610FDE /* MovieDetailsHeaderView.swift */,
+				0EE2302D25B1FC7C004F0D27 /* MovieDetailsGeneralInfoView.swift */,
+				0EE2302C25B1FC7C004F0D27 /* MovieDetailsCastInfoView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -344,6 +350,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E6F152225AF4846004863B0 /* APIService.swift in Sources */,
+				0EE2302E25B1FC7C004F0D27 /* MovieDetailsCastInfoView.swift in Sources */,
 				0E6F14EB25AF4612004863B0 /* MoviesListViewController.swift in Sources */,
 				0E6F14E725AF4612004863B0 /* AppDelegate.swift in Sources */,
 				0E6F152F25AF6E2D004863B0 /* MoviesListViewModel.swift in Sources */,
@@ -351,6 +358,7 @@
 				0E6F154425AF8215004863B0 /* OMDBApiService.swift in Sources */,
 				0E59F73B25B0DC8900610FDE /* LoggerService.swift in Sources */,
 				0E59F7EE25B1BD8B00610FDE /* MovieDetailsModel.swift in Sources */,
+				0EE2302F25B1FC7C004F0D27 /* MovieDetailsGeneralInfoView.swift in Sources */,
 				0E59F7EC25B1BD8B00610FDE /* MovieDetailsViewModel.swift in Sources */,
 				0E59F7F425B1BF1D00610FDE /* MovieDetailsHeaderView.swift in Sources */,
 				0E6F152A25AF48E8004863B0 /* MoviesListModel.swift in Sources */,
