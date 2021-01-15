@@ -18,8 +18,13 @@ enum OMDBApiParameter: String {
     }
 }
 
+struct OMDBApiResponseError: APIResponseError {
+    let error: String
+}
+
 enum OMDBApiEndpoint: Endpoint {
-    case movieList(searchedTitle: String, page: Int)
+    case moviesList(searchedTitle: String, page: Int)
+    case movieDetail(imdbID: String)
 
     var path: String {
         return ""
@@ -31,11 +36,15 @@ enum OMDBApiEndpoint: Endpoint {
 
     var queryItems: [URLQueryItem] {
         switch self {
-        case .movieList(searchedTitle: let searchedTitle, page: let page):
+        case .moviesList(searchedTitle: let searchedTitle, page: let page):
             return [apiKeyQueryItem,
                     OMDBApiParameter.type.queryItem(for: MediaType.movie.rawValue),
                     OMDBApiParameter.searchedTitle.queryItem(for: searchedTitle),
                     OMDBApiParameter.page.queryItem(for: "\(page)")]
+
+        case .movieDetail(imdbID: let imdbId):
+            return [apiKeyQueryItem,
+                    OMDBApiParameter.item.queryItem(for: imdbId)]
         }
     }
 
@@ -78,6 +87,8 @@ enum OMDBErrorData: ErrorData {
             self = .noInternet
         case ApiError.generalError(error: let error):
             self = .error(errorDescription: error.localizedDescription)
+        case ApiError.response(errorFromApi: let errorFromApi):
+            self = .error(errorDescription: errorFromApi)
         case ApiError.wrongUrl:
             self = .error(errorDescription: NSLocalizedString("Wrong URL", comment: "Wrong URL"))
         }

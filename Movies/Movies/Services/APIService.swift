@@ -11,15 +11,18 @@ import Combine
 enum ApiError: Error {
     case wrongUrl
     case noInternet
+    case response(errorFromApi: String)
     case generalError(error: Error)
-
-    static let noInternetErrorCode = -1009
 }
 
 protocol Endpoint {
     var path: String { get }
     var method: String { get }
     var queryItems: [URLQueryItem] { get }
+}
+
+protocol APIResponseError: Decodable {
+    var error: String { get }
 }
 
 protocol Pagination {
@@ -42,11 +45,12 @@ extension Pagination {
     }
 }
 
+
 protocol APIServiceProtocol {
     var baseUrl: String { get }
     var pagination: Pagination? { get set }
     func fullUrl(for endpoint: Endpoint) -> URL?
-    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, ApiError>?
+    func performRequest<Response: Decodable, APIError: Decodable>(to endpoint: Endpoint, responseErrorType: APIError.Type) -> AnyPublisher<Response, ApiError>?
 }
 
 extension APIServiceProtocol {
@@ -58,24 +62,32 @@ extension APIServiceProtocol {
         return urlComponents?.url
     }
 
-    func performRequest<T: Decodable>(to endpoint: Endpoint) -> AnyPublisher<T, ApiError>? {
+    func performRequest<Response: Decodable, APIError: Decodable>(to endpoint: Endpoint, responseErrorType: APIError.Type) -> AnyPublisher<Response, ApiError>? {
         guard let url = fullUrl(for: endpoint) else {
             return Fail(error: ApiError.wrongUrl).eraseToAnyPublisher()
         }
 
         return URLSession.shared.dataTaskPublisher(for: url)
-                .map { $0.data }
-                .decode(type: T.self, decoder: JSONDecoder())
-                .mapError({ (error) -> ApiError in
-                    let nsError = error as NSError
+            .mapError {
+                if $0.code == URLError.notConnectedToInternet {
+                    return ApiError.noInternet
+                }
+                return ApiError.generalError(error: $0)
+            }
+            .map { $0.data }
+            .flatMap { data -> AnyPublisher<Response, ApiError> in
+                return Just(data)
+                    .decode(type: Response.self, decoder: JSONDecoder())
+                    .mapError({ (error) -> ApiError in
 
-                    if nsError.code == ApiError.noInternetErrorCode {
-                        return ApiError.noInternet
-                    }
+                        if let errorResponse = try? JSONDecoder().decode(APIError.self, from: data) as? APIResponseError {
+                            return ApiError.response(errorFromApi: errorResponse.error)
+                        }
 
-                    return ApiError.generalError(error: error)
-                })
-                .eraseToAnyPublisher()
+                        return ApiError.generalError(error: error)
+                    })
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
     }
-    
 }

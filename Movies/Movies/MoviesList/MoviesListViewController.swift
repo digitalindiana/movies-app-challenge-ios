@@ -15,7 +15,7 @@ class MoviesListViewController: UIViewController {
     let searchController = UISearchController(searchResultsController: nil)
     let numberOfCellsPerRow: CGFloat = 2
 
-    var viewModel: ModelsListViewModelProtocol? = DefaultModelsListViewModel()
+    var viewModel: MoviesListViewModelProtocol? = DefaultMoviesListViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()

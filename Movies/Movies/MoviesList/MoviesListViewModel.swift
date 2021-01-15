@@ -18,7 +18,7 @@ enum MoviesListSection {
 typealias MoviesDataSource = UICollectionViewDiffableDataSource<MoviesListSection, MovieMetadata>
 typealias MoviesDataSnapshot = NSDiffableDataSourceSnapshot<MoviesListSection, MovieMetadata>
 
-protocol ModelsListViewModelProtocol {
+protocol MoviesListViewModelProtocol {
     // DataSource for collection view diffable data source
     var dataSource: MoviesDataSource? { get }
 
@@ -39,7 +39,7 @@ protocol ModelsListViewModelProtocol {
     func fetchMoreMovies()
 }
 
-class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
+class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
 
@@ -99,8 +99,9 @@ class DefaultModelsListViewModel: NSObject, ModelsListViewModelProtocol {
 
         isLoadingData = true
 
-        let endpoint = OMDBApiEndpoint.movieList(searchedTitle: searchedTitle, page: pagination.currentPage)
-        let publisher: AnyPublisher<MoviesListResponse, ApiError>? = apiService?.performRequest(to: endpoint)
+        let endpoint = OMDBApiEndpoint.moviesList(searchedTitle: searchedTitle, page: pagination.currentPage)
+        let publisher: AnyPublisher<MoviesListResponse, ApiError>? = apiService?.performRequest(to: endpoint,
+                                                                                                responseErrorType: OMDBApiResponseError.self)
 
         publisher?.receive(on: DispatchQueue.main)
                   .sink(receiveCompletion: { [weak self] completion in
