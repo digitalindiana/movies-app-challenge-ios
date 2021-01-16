@@ -33,10 +33,6 @@ class MovieDetailsViewController: UIViewController {
                                         for: .touchUpInside)
 
         configureHandlers()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
 
         if let imdbId = imdbId {
             viewModel?.fetchMovie(imdbID: imdbId)

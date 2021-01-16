@@ -42,6 +42,7 @@ class MovieDetailsGeneralInfoView: UIView {
         scoreLabel.text = NSLocalizedString("Score", comment: "")
         reviewsLabel.text = NSLocalizedString("Reviews", comment: "")
         popularityLabel.text = NSLocalizedString("Popularity", comment: "")
+        fill(with: MovieDetailsGeneralInfoModel(categories: "", duration: "", rating: "", synopsis: "", score: "", reviews: "", popularity: ""))
     }
 
     func fill(with model: MovieDetailsGeneralInfoModel) {

@@ -23,6 +23,7 @@ protocol MovieDetailViewModelProtocol {
     var movieLoaded: ((MovieDetailsViewModelDataTuple) -> Void)? { get set }
     var errorHandler: ((ErrorData) -> Void)? { get set }
 
+    // Data related
     var currentMovie: Movie? { get set }
     func fetchMovie(imdbID: String)
 }
@@ -37,6 +38,8 @@ class DefaultMovieDetailsViewModel: NSObject, MovieDetailViewModelProtocol {
 
     var subscriptions: Set<AnyCancellable> = Set()
 
+    /// Fetches the details for given movie ID
+    /// - Parameter imdbID: String
     func fetchMovie(imdbID: String) {
         LoggerService.shared.debug("Getting movie \(imdbID)")
 
@@ -61,6 +64,9 @@ class DefaultMovieDetailsViewModel: NSObject, MovieDetailViewModelProtocol {
             }).store(in: &subscriptions)
     }
 
+    /// Converts model into the data created for view
+    /// - Parameter movie: Movie
+    /// - Returns: Tuple with header, general and cast informations
     func viewData(for movie: Movie) -> MovieDetailsViewModelDataTuple {
         let header = MovieDetailsHeaderModel(posterImageUrl: URL(string: movie.poster),
                                              title: movie.title,

@@ -20,6 +20,12 @@ class MovieDetailsHeaderView: UIView {
     @IBOutlet var movieYearLabel: UILabel!
     @IBOutlet var playButton: UIButton!
 
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        fill(with: MovieDetailsHeaderModel(posterImageUrl: nil, title: "", year: ""))
+    }
+
     func fill(with model: MovieDetailsHeaderModel) {
         posterImageView.sd_setImage(with: model.posterImageUrl)
         movieTitleLabel.text = model.title

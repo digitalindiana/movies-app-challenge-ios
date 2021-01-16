@@ -7,14 +7,16 @@
 
 import UIKit
 
+
 class MoviesListViewController: UIViewController {
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var errorView: ErrorView!
 
     let searchController = UISearchController(searchResultsController: nil)
-    let numberOfCellsPerRow: CGFloat = 2
-
     var viewModel: MoviesListViewModelProtocol? = DefaultMoviesListViewModel()
+
+    // Constants
+    static let numberOfCellsPerRow: CGFloat = 2
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,12 +32,14 @@ class MoviesListViewController: UIViewController {
 
     func configureCollectionView() {
         collectionView.delegate = self
+
+        // Calculate item size and section inset
         if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
             let horizontalSpacing = flowLayout.minimumInteritemSpacing
             flowLayout.sectionInset = UIEdgeInsets(top: horizontalSpacing, left: horizontalSpacing,
                                                    bottom: horizontalSpacing, right: horizontalSpacing)
-            let separatorsWidth = max(0, numberOfCellsPerRow - 1) * horizontalSpacing + 2 * horizontalSpacing
-            let cellWidth = (view.frame.width - separatorsWidth) / numberOfCellsPerRow
+            let separatorsWidth = max(0, MoviesListViewController.numberOfCellsPerRow - 1) * horizontalSpacing + 2 * horizontalSpacing
+            let cellWidth = (view.frame.width - separatorsWidth) / MoviesListViewController.numberOfCellsPerRow
             flowLayout.itemSize = CGSize(width: cellWidth, height: cellWidth)
         }
     }

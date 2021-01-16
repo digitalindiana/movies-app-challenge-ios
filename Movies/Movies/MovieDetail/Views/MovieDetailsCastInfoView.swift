@@ -30,6 +30,7 @@ class MovieDetailsCastInfoView: UIView {
         directorLabel.text = NSLocalizedString("Director", comment: "")
         writerLabel.text = NSLocalizedString("Writer", comment: "")
         actorsLabel.text = NSLocalizedString("Actors", comment: "")
+        fill(with: MovieDetailsCastInfoModel(director: "", writer: "", actors: ""))
     }
 
     func fill(with model: MovieDetailsCastInfoModel) {
