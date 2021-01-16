@@ -8,20 +8,21 @@
 import Foundation
 
 // MARK: - MoviesListResponse
+
 struct MoviesListResponse: Codable {
-    let movies: [MovieMetadata]?
-    let totalResults, error: String?
+    let movies: [MovieMetadata]
+    let totalResults: String
     let response: String
 
     enum CodingKeys: String, CodingKey {
         case movies = "Search"
-        case error = "Error"
         case totalResults
         case response = "Response"
     }
 }
 
 // MARK: - Movie
+
 struct MovieMetadata: Codable {
     let uuid = UUID()
     let title, year, imdbID: String
@@ -38,7 +39,7 @@ struct MovieMetadata: Codable {
 }
 
 extension MovieMetadata: Hashable {
-    static func ==(lhs: MovieMetadata, rhs: MovieMetadata) -> Bool {
+    static func == (lhs: MovieMetadata, rhs: MovieMetadata) -> Bool {
         return lhs.uuid == rhs.uuid
     }
 

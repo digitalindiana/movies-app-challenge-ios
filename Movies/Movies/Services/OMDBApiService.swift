@@ -14,7 +14,7 @@ enum OMDBApiParameter: String {
     case page, type
 
     func queryItem(for value: String) -> URLQueryItem {
-        return URLQueryItem(name: self.rawValue, value: value)
+        return URLQueryItem(name: rawValue, value: value)
     }
 }
 
@@ -30,21 +30,17 @@ enum OMDBApiEndpoint: Endpoint {
         return ""
     }
 
-    var method: String {
-        return "GET"
-    }
-
     var queryItems: [URLQueryItem] {
         switch self {
-        case .moviesList(searchedTitle: let searchedTitle, page: let page):
-            return [apiKeyQueryItem,
-                    OMDBApiParameter.type.queryItem(for: MediaType.movie.rawValue),
-                    OMDBApiParameter.searchedTitle.queryItem(for: searchedTitle),
-                    OMDBApiParameter.page.queryItem(for: "\(page)")]
+            case let .moviesList(searchedTitle: searchedTitle, page: page):
+                return [apiKeyQueryItem,
+                        OMDBApiParameter.type.queryItem(for: MediaType.movie.rawValue),
+                        OMDBApiParameter.searchedTitle.queryItem(for: searchedTitle),
+                        OMDBApiParameter.page.queryItem(for: "\(page)")]
 
-        case .movieDetail(imdbID: let imdbId):
-            return [apiKeyQueryItem,
-                    OMDBApiParameter.item.queryItem(for: imdbId)]
+            case let .movieDetail(imdbID: imdbId):
+                return [apiKeyQueryItem,
+                        OMDBApiParameter.item.queryItem(for: imdbId)]
         }
     }
 
@@ -54,49 +50,48 @@ enum OMDBApiEndpoint: Endpoint {
     }
 }
 
-enum OMDBErrorData: ErrorData {
+enum OMDBErrorData: ErrorData, Equatable {
     case emptyQuery
     case noInternet
     case error(errorDescription: String)
 
     var imageName: String {
         switch self {
-        case .emptyQuery:
-            return "icon_no_data"
-        case .noInternet:
-            return "icon_no_internet"
-        case .error:
-            return "icon_error"
+            case .emptyQuery:
+                return "icon_no_data"
+            case .noInternet:
+                return "icon_no_internet"
+            case .error:
+                return "icon_error"
         }
     }
 
     var errorDescription: String {
         switch self {
-        case .emptyQuery:
-            return NSLocalizedString("Type at least 3 characters to start search..", comment: "Empty data info")
-        case .noInternet:
-            return NSLocalizedString("Check Internet connection and try again", comment: "No Internet Connection")
-        case .error(errorDescription: let errorDescription):
-            return errorDescription
+            case .emptyQuery:
+                return NSLocalizedString("Type at least 3 characters to start search..", comment: "Empty data info")
+            case .noInternet:
+                return NSLocalizedString("Check Internet connection and try again", comment: "No Internet Connection")
+            case let .error(errorDescription: errorDescription):
+                return errorDescription
         }
     }
 
-    init(apiError: ApiError){
+    init(apiError: ApiError) {
         switch apiError {
-        case ApiError.noInternet:
-            self = .noInternet
-        case ApiError.generalError(error: let error):
-            self = .error(errorDescription: error.localizedDescription)
-        case ApiError.response(errorFromApi: let errorFromApi):
-            self = .error(errorDescription: errorFromApi)
-        case ApiError.wrongUrl:
-            self = .error(errorDescription: NSLocalizedString("Wrong URL", comment: "Wrong URL"))
+            case ApiError.noInternet:
+                self = .noInternet
+            case let ApiError.generalError(error: error):
+                self = .error(errorDescription: error.localizedDescription)
+            case let ApiError.response(errorFromApi: errorFromApi):
+                self = .error(errorDescription: errorFromApi)
+            case ApiError.wrongUrl:
+                self = .error(errorDescription: NSLocalizedString("Wrong URL", comment: "Wrong URL"))
         }
     }
 }
 
 struct DefaultPagination: Pagination {
-
     var queryItem: String = ""
     // omdbapi starts pagination from 1 - not from 0..
     // "Error": "The offset specified in a OFFSET clause may not be negative."

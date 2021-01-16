@@ -5,8 +5,8 @@
 //  Created by Piotr Adamczak on 13/01/2021.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 enum ApiError: Error {
     case wrongUrl
@@ -15,9 +15,9 @@ enum ApiError: Error {
     case generalError(error: Error)
 }
 
+// sourcery: AutoMockable
 protocol Endpoint {
     var path: String { get }
-    var method: String { get }
     var queryItems: [URLQueryItem] { get }
 }
 
@@ -25,6 +25,7 @@ protocol APIResponseError: Decodable {
     var error: String { get }
 }
 
+// sourcery: AutoMockable
 protocol Pagination {
     var queryItem: String { get }
     var currentPage: Int { get }
@@ -45,7 +46,7 @@ extension Pagination {
     }
 }
 
-
+// sourcery: AutoMockable
 protocol APIServiceProtocol {
     var baseUrl: String { get }
     var pagination: Pagination? { get set }
@@ -54,7 +55,6 @@ protocol APIServiceProtocol {
 }
 
 extension APIServiceProtocol {
-
     func fullUrl(for endpoint: Endpoint) -> URL? {
         var urlComponents = URLComponents(string: baseUrl)
         urlComponents?.path = endpoint.path
@@ -76,7 +76,7 @@ extension APIServiceProtocol {
             }
             .map { $0.data }
             .flatMap { data -> AnyPublisher<Response, ApiError> in
-                return Just(data)
+                Just(data)
                     .decode(type: Response.self, decoder: JSONDecoder())
                     .mapError({ (error) -> ApiError in
 

@@ -5,11 +5,11 @@
 //  Created by Piotr Adamczak on 13/01/2021.
 //
 
-import Foundation
-import UIKit
 import Combine
+import Foundation
 import Logging
 import SDWebImage
+import UIKit
 
 enum MoviesListSection {
     case movies
@@ -18,6 +18,7 @@ enum MoviesListSection {
 typealias MoviesDataSource = UICollectionViewDiffableDataSource<MoviesListSection, MovieMetadata>
 typealias MoviesDataSnapshot = NSDiffableDataSourceSnapshot<MoviesListSection, MovieMetadata>
 
+// sourcery: AutoMockable
 protocol MoviesListViewModelProtocol {
     // DataSource for collection view diffable data source
     var dataSource: MoviesDataSource? { get }
@@ -26,8 +27,8 @@ protocol MoviesListViewModelProtocol {
     var apiService: APIServiceProtocol? { get }
 
     // Handlers
-    var moviesLoaded: (([MovieMetadata]) -> ())? { get set }
-    var errorHandler: ((ErrorData) -> ())? { get set }
+    var moviesLoaded: (([MovieMetadata]) -> Void)? { get set }
+    var errorHandler: ((ErrorData) -> Void)? { get set }
 
     // Setting up the data source for collection view
     func setupDataSource(for collectionView: UICollectionView)
@@ -43,8 +44,8 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
     var apiService: APIServiceProtocol? = OMDBApiService()
     var dataSource: MoviesDataSource?
 
-    var moviesLoaded: (([MovieMetadata]) -> ())?
-    var errorHandler: ((ErrorData) -> ())?
+    var moviesLoaded: (([MovieMetadata]) -> Void)?
+    var errorHandler: ((ErrorData) -> Void)?
 
     var currentMovies: [MovieMetadata] = [] {
         didSet {
@@ -63,23 +64,23 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
         dataSource = UICollectionViewDiffableDataSource(collectionView: collectionView,
                                                         cellProvider: { (collectionView, indexPath, movie) -> UICollectionViewCell? in
 
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCell.reuseIdentifier,
-                                                                for: indexPath) as? MovieListCell {
-                cell.movieTitleLabel.text = movie.title
-                cell.posterImageView.sd_setImage(with: URL(string: movie.poster))
-                return cell
-            }
-            return UICollectionViewCell()
-        })
+                                                            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListCell.reuseIdentifier,
+                                                                                                             for: indexPath) as? MovieListCell {
+                                                                cell.movieTitleLabel?.text = movie.title
+                                                                cell.posterImageView?.sd_setImage(with: URL(string: movie.poster))
+                                                                return cell
+                                                            }
+                                                            return UICollectionViewCell()
+                                                        })
     }
 
     func paginationForTerm(_ searchedTitle: String) -> Pagination {
         // If we are searching the same item -> increment page
         if let lastPagination = apiService?.pagination,
-               lastPagination.queryItem == searchedTitle {
-                return lastPagination.nextPagination()
+           lastPagination.queryItem == searchedTitle {
+            return lastPagination.nextPagination()
         } else {
-            self.clearData(generateError: false)
+            clearData(generateError: false)
             return DefaultPagination(queryItem: searchedTitle)
         }
     }
@@ -104,34 +105,29 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
                                                                                                 responseErrorType: OMDBApiResponseError.self)
 
         publisher?.receive(on: DispatchQueue.main)
-                  .sink(receiveCompletion: { [weak self] completion in
-            guard let self = self else { return }
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self = self else { return }
 
-            if case let .failure(apiError) = completion {
-                LoggerService.shared.error("Got error while on receving movies: \(apiError)")
-                self.errorHandler?(OMDBErrorData(apiError: apiError))
-            }
+                if case let .failure(apiError) = completion {
+                    LoggerService.shared.error("Got error while on receving movies: \(apiError)")
+                    self.errorHandler?(OMDBErrorData(apiError: apiError))
+                }
 
-            self.isLoadingData = false
+                self.isLoadingData = false
 
-        }, receiveValue: { [weak self] moviesListResponse in
-            guard let self = self else { return }
+            }, receiveValue: { [weak self] moviesListResponse in
+                guard let self = self else { return }
 
-            if let movies = moviesListResponse.movies,
-               let totalResultsString = moviesListResponse.totalResults,
-               let totalResults = Int(totalResultsString) {
+                if let totalResults = Int(moviesListResponse.totalResults) {
+                    let movies = moviesListResponse.movies
+                    LoggerService.shared.debug("Got response with \(movies.count) movies, total:\(totalResults)")
+                    self.currentMovies.append(contentsOf: movies)
+                    self.apiService?.pagination = pagination.update(savedItems: self.currentMovies.count,
+                                                                    totalItems: totalResults)
+                    self.moviesLoaded?(self.currentMovies)
+                }
 
-                LoggerService.shared.debug("Got response with \(movies.count) movies, total:\(totalResults)")
-                self.currentMovies.append(contentsOf: movies)
-                self.apiService?.pagination = pagination.update(savedItems: self.currentMovies.count,
-                                                                totalItems: totalResults)
-                self.moviesLoaded?(self.currentMovies)
-
-            } else if let error = moviesListResponse.error {
-                self.errorHandler?(OMDBErrorData.error(errorDescription: error))
-            }
-
-        }).store(in: &subscriptions)
+            }).store(in: &subscriptions)
     }
 
     func fetchMoreMovies() {
@@ -141,7 +137,7 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
     }
 
     func clearData(generateError: Bool) {
-        self.currentMovies.removeAll()
+        currentMovies.removeAll()
         apiService?.pagination = nil
 
         if generateError {
@@ -151,10 +147,10 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
 
     func updateListWith(_ movies: [MovieMetadata]) {
         var snapshot = MoviesDataSnapshot()
-        snapshot.appendSections([.movies])
         if movies.count == 0 {
             snapshot.deleteAllItems()
         } else {
+            snapshot.appendSections([.movies])
             snapshot.appendItems(movies)
         }
         dataSource?.apply(snapshot, animatingDifferences: true)

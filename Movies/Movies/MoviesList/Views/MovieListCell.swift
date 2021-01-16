@@ -9,18 +9,17 @@ import Foundation
 import UIKit
 
 class MovieListCell: UICollectionViewCell {
-
     static var reuseIdentifier: String {
         return "MovieListCellIdentifier"
     }
 
-    @IBOutlet weak var posterImageView: UIImageView!
-    @IBOutlet weak var movieTitleLabel: UILabel!
+    @IBOutlet var posterImageView: UIImageView?
+    @IBOutlet var movieTitleLabel: UILabel?
 
     override func awakeFromNib() {
-        self.layer.cornerRadius = 5
+        layer.cornerRadius = 5
 
-        movieTitleLabel.adjustsFontSizeToFitWidth = true
-        movieTitleLabel.minimumScaleFactor = 0.5
+        movieTitleLabel?.adjustsFontSizeToFitWidth = true
+        movieTitleLabel?.minimumScaleFactor = 0.5
     }
 }

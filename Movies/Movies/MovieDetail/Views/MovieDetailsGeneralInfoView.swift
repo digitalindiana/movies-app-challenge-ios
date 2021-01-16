@@ -19,25 +19,25 @@ struct MovieDetailsGeneralInfoModel {
 }
 
 class MovieDetailsGeneralInfoView: UIView {
-    @IBOutlet weak var categoriesLabel: UILabel!
-    @IBOutlet weak var durationLabel: UILabel!
-    @IBOutlet weak var ratingLabel: UILabel!
-    
-    @IBOutlet weak var synopsisTitleLabel: UILabel!
-    @IBOutlet weak var synopsisValueLabel: UILabel!
+    @IBOutlet var categoriesLabel: UILabel!
+    @IBOutlet var durationLabel: UILabel!
+    @IBOutlet var ratingLabel: UILabel!
 
-    @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var scoreValueLabel: UILabel!
+    @IBOutlet var synopsisTitleLabel: UILabel!
+    @IBOutlet var synopsisValueLabel: UILabel!
 
-    @IBOutlet weak var reviewsLabel: UILabel!
-    @IBOutlet weak var reviewsValueLabel: UILabel!
+    @IBOutlet var scoreLabel: UILabel!
+    @IBOutlet var scoreValueLabel: UILabel!
 
-    @IBOutlet weak var popularityLabel: UILabel!
-    @IBOutlet weak var popularityValueLabel: UILabel!
+    @IBOutlet var reviewsLabel: UILabel!
+    @IBOutlet var reviewsValueLabel: UILabel!
+
+    @IBOutlet var popularityLabel: UILabel!
+    @IBOutlet var popularityValueLabel: UILabel!
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         synopsisTitleLabel.text = NSLocalizedString("Synopsis", comment: "")
         scoreLabel.text = NSLocalizedString("Score", comment: "")
         reviewsLabel.text = NSLocalizedString("Reviews", comment: "")

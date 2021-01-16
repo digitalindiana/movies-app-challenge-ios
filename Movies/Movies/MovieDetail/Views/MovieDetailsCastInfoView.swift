@@ -15,18 +15,18 @@ struct MovieDetailsCastInfoModel {
 }
 
 class MovieDetailsCastInfoView: UIView {
-    @IBOutlet weak var directorLabel: UILabel!
-    @IBOutlet weak var directorValueLabel: UILabel!
+    @IBOutlet var directorLabel: UILabel!
+    @IBOutlet var directorValueLabel: UILabel!
 
-    @IBOutlet weak var writerLabel: UILabel!
-    @IBOutlet weak var writerValueLabel: UILabel!
+    @IBOutlet var writerLabel: UILabel!
+    @IBOutlet var writerValueLabel: UILabel!
 
-    @IBOutlet weak var actorsLabel: UILabel!
-    @IBOutlet weak var actorsValueLabel: UILabel!
+    @IBOutlet var actorsLabel: UILabel!
+    @IBOutlet var actorsValueLabel: UILabel!
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         directorLabel.text = NSLocalizedString("Director", comment: "")
         writerLabel.text = NSLocalizedString("Writer", comment: "")
         actorsLabel.text = NSLocalizedString("Actors", comment: "")

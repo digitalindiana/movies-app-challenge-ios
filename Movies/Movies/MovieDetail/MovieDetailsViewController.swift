@@ -12,17 +12,16 @@ class MovieDetailsSegue: UIStoryboardSegue {
 }
 
 class MovieDetailsViewController: UIViewController {
-
     var imdbId: String?
 
-    @IBOutlet weak var scrollView: UIScrollView!
-    @IBOutlet weak var contentStackView: UIStackView!
-    @IBOutlet weak var headerView: MovieDetailsHeaderView!
-    @IBOutlet weak var generalInfoView: MovieDetailsGeneralInfoView!
-    @IBOutlet weak var castInfoView: MovieDetailsCastInfoView!
-    @IBOutlet weak var errorView: ErrorView!
+    @IBOutlet var scrollView: UIScrollView!
+    @IBOutlet var contentStackView: UIStackView!
+    @IBOutlet var headerView: MovieDetailsHeaderView!
+    @IBOutlet var generalInfoView: MovieDetailsGeneralInfoView!
+    @IBOutlet var castInfoView: MovieDetailsCastInfoView!
+    @IBOutlet var errorView: ErrorView!
 
-    var viewModel: MovieDetailViewModelProtocol? = DefaultMovieDetailViewModel()
+    var viewModel: MovieDetailViewModelProtocol? = DefaultMovieDetailsViewModel()
 
     override func viewDidLoad() {
         super.viewDidLoad()

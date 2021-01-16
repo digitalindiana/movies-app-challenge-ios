@@ -8,9 +8,8 @@
 import UIKit
 
 class MoviesListViewController: UIViewController {
-
-    @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var errorView: ErrorView!
+    @IBOutlet var collectionView: UICollectionView!
+    @IBOutlet var errorView: ErrorView!
 
     let searchController = UISearchController(searchResultsController: nil)
     let numberOfCellsPerRow: CGFloat = 2
@@ -36,7 +35,7 @@ class MoviesListViewController: UIViewController {
             flowLayout.sectionInset = UIEdgeInsets(top: horizontalSpacing, left: horizontalSpacing,
                                                    bottom: horizontalSpacing, right: horizontalSpacing)
             let separatorsWidth = max(0, numberOfCellsPerRow - 1) * horizontalSpacing + 2 * horizontalSpacing
-            let cellWidth = (view.frame.width - separatorsWidth)/numberOfCellsPerRow
+            let cellWidth = (view.frame.width - separatorsWidth) / numberOfCellsPerRow
             flowLayout.itemSize = CGSize(width: cellWidth, height: cellWidth)
         }
     }
@@ -77,7 +76,6 @@ class MoviesListViewController: UIViewController {
         if let movie = sender as? MovieMetadata,
            let movieDetailsVC = segue.destination as? MovieDetailsViewController,
            segue is MovieDetailsSegue {
-
             movieDetailsVC.imdbId = movie.imdbID
         }
     }
@@ -86,7 +84,7 @@ class MoviesListViewController: UIViewController {
 extension MoviesListViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchedText = searchController.searchBar.text,
-                  searchedText.count > 2 else {
+              searchedText.count > 2 else {
             viewModel?.clearData(generateError: true)
             return
         }

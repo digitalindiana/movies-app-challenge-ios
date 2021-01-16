@@ -8,15 +8,16 @@
 import Foundation
 import UIKit
 
+// sourcery: AutoMockable
 protocol ErrorData {
     var imageName: String { get }
     var errorDescription: String { get }
 }
 
 class ErrorView: UIView {
-    @IBOutlet weak var stackView: UIStackView!
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var errorLabel: UILabel!
+    @IBOutlet var stackView: UIStackView!
+    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var errorLabel: UILabel!
 
     func show(_ errorData: ErrorData) {
         imageView.image = UIImage(named: errorData.imageName)

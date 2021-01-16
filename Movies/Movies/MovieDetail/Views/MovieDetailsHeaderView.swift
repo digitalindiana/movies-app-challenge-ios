@@ -15,10 +15,10 @@ struct MovieDetailsHeaderModel {
 }
 
 class MovieDetailsHeaderView: UIView {
-    @IBOutlet weak var posterImageView: UIImageView!
-    @IBOutlet weak var movieTitleLabel: UILabel!
-    @IBOutlet weak var movieYearLabel: UILabel!
-    @IBOutlet weak var playButton: UIButton!
+    @IBOutlet var posterImageView: UIImageView!
+    @IBOutlet var movieTitleLabel: UILabel!
+    @IBOutlet var movieYearLabel: UILabel!
+    @IBOutlet var playButton: UIButton!
 
     func fill(with model: MovieDetailsHeaderModel) {
         posterImageView.sd_setImage(with: model.posterImageUrl)

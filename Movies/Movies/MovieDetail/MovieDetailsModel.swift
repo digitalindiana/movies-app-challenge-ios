@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: - Movie
+
 struct Movie: Codable {
     let title, year, rated, released: String
     let runtime, genre, director, writer: String
@@ -47,6 +48,7 @@ struct Movie: Codable {
 }
 
 // MARK: - Rating
+
 struct Rating: Codable {
     let source, value: String
 
