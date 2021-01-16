@@ -35,7 +35,7 @@ protocol MoviesListViewModelProtocol {
 
     var currentMovies: [MovieMetadata] { get }
 
-    func fetchMovies(searchedTitle: String)
+    func fetchMovies(searchedTitle: String, forced: Bool)
     func fetchMoreMovies()
 }
 
@@ -84,8 +84,8 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
         }
     }
 
-    func fetchMovies(searchedTitle: String) {
-        if isLoadingData {
+    func fetchMovies(searchedTitle: String, forced: Bool) {
+        if isLoadingData && !forced {
             return
         }
 
@@ -136,7 +136,7 @@ class DefaultMoviesListViewModel: NSObject, MoviesListViewModelProtocol {
 
     func fetchMoreMovies() {
         if let lastPagination = apiService?.pagination {
-            fetchMovies(searchedTitle: lastPagination.queryItem)
+            fetchMovies(searchedTitle: lastPagination.queryItem, forced: false)
         }
     }
 

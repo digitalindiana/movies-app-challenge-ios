@@ -59,6 +59,7 @@ class MoviesListViewController: UIViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.errorView.isHidden = false
+                self.collectionView.isHidden = true
                 self.errorView.show(errorData)
             }
         }
@@ -67,6 +68,7 @@ class MoviesListViewController: UIViewController {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.errorView.isHidden = true
+                self.collectionView.isHidden = false
             }
         }
     }
@@ -89,7 +91,7 @@ extension MoviesListViewController: UISearchResultsUpdating {
             return
         }
 
-        viewModel?.fetchMovies(searchedTitle: searchedText)
+        viewModel?.fetchMovies(searchedTitle: searchedText, forced: true)
     }
 }
 

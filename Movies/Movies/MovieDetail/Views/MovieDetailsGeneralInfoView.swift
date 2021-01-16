@@ -51,5 +51,6 @@ class MovieDetailsGeneralInfoView: UIView {
         synopsisValueLabel.text = model.synopsis
         scoreValueLabel.text = model.score
         reviewsValueLabel.text = model.reviews
+        popularityValueLabel.text = model.popularity
     }
 }
