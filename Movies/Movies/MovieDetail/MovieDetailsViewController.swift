@@ -66,7 +66,8 @@ class MovieDetailsViewController: UIViewController {
         let alert = UIAlertController(title: NSLocalizedString("Warning ⚠️", comment: ""),
                                       message: NSLocalizedString("Playback not supported 😥", comment: ""),
                                       preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Okay..", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Okay..", comment: ""),
+                                      style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
 }
