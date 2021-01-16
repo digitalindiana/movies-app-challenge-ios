@@ -1,5 +1,5 @@
 //
-//  APIServiceProtocol.swift
+//  APIService.swift
 //  Movies
 //
 //  Created by Piotr Adamczak on 13/01/2021.
@@ -62,6 +62,13 @@ extension APIServiceProtocol {
         return urlComponents?.url
     }
 
+    /// Perform request which tries to decode JSON into Response object
+    /// In failure case it will try to parse APIError JSON format response
+    /// If it would be impossible - core error would be returned wrapped as ApiError
+    /// - Parameters:
+    ///   - endpoint: Endpoint struct which defines things like path.
+    ///   - responseErrorType: Class used to decode JSON in case of API error
+    /// - Returns: Publisher with given generic Response type and ApiError
     func performRequest<Response: Decodable, APIError: Decodable>(to endpoint: Endpoint, responseErrorType: APIError.Type) -> AnyPublisher<Response, ApiError>? {
         guard let url = fullUrl(for: endpoint) else {
             return Fail(error: ApiError.wrongUrl).eraseToAnyPublisher()

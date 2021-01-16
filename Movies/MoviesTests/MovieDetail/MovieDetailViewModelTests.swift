@@ -42,7 +42,7 @@ class MovieDetailViewModelTests: XCTestCase {
             XCTAssertEqual(movieViewData.general.popularity, "10")
             XCTAssertEqual(movieViewData.general.rating, "⭐ 10")
             XCTAssertEqual(movieViewData.general.reviews, "100")
-            XCTAssertEqual(movieViewData.general.score, "w10")
+            XCTAssertEqual(movieViewData.general.score, "10")
             XCTAssertEqual(movieViewData.general.synopsis, "plot")
             XCTAssertEqual(movieViewData.cast.actors, "actors")
             XCTAssertEqual(movieViewData.cast.director, "director")
