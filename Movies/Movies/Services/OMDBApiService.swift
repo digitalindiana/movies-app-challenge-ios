@@ -20,6 +20,10 @@ enum OMDBApiParameter: String {
 
 struct OMDBApiResponseError: APIResponseError {
     let error: String
+
+    enum CodingKeys: String, CodingKey {
+        case error = "Error"
+    }
 }
 
 enum OMDBApiEndpoint: Endpoint {
